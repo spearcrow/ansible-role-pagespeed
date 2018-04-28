@@ -1,0 +1,21 @@
+---
+dependencies: []
+
+galaxy_info:
+  author: miguelenes
+  description: Google Pagespeed dynamic module for Nginx
+  company: "iMotorbike Sdn. Bhd."
+  license: "license (BSD, MIT)"
+  min_ansible_version: 2.4
+  platforms:
+  - name: Debian
+    versions:
+    - all
+  - name: Ubuntu
+    versions:
+    - all
+  galaxy_tags:
+    - development
+    - system
+    - nginx
+    - performance
