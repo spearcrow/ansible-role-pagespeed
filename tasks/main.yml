@@ -10,7 +10,7 @@
        - zlib1g-dev
 
 - name: check nginx version compatibility
-  shell: /usr/local/nginx/sbin/nginx -v 2>&1
+  shell: /usr/sbin/nginx -v 2>&1
   register: nginxVersion
 
 - set_fact:
