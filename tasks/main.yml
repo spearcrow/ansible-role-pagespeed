@@ -65,7 +65,6 @@
 - name: remove base packages
   apt: name={{item}} state=absent
   with_items:
-       - nginx
        - unzip
        - gcc
        - make
