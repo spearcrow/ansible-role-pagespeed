@@ -61,13 +61,3 @@
 
 - name: remove build files
   file: path="/tmp/incubator-pagespeed-ngx-{{ google_pagespeed_version }}" state=absent
-
-- name: remove base packages
-  apt: name={{item}} state=absent
-  with_items:
-       - unzip
-       - gcc
-       - make
-       - libpcre3-dev
-       - zlib1g-dev
-       - uuid-dev
