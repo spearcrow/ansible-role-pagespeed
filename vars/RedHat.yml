@@ -1,0 +1,7 @@
+gps_dependency_packages:
+  - gcc-c++
+  - libuuid-devel
+  - make
+  - pcre-devel
+  - unzip
+  - zlib-devel
