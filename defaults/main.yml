@@ -1,2 +1,3 @@
 ---
-google_pagespeed_version: 1.13.35.2-stable
+gps_version: 1.13.35.2-stable
+gps_ngx_version: 1.14.2
