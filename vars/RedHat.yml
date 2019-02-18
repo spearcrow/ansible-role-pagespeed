@@ -1,7 +1,13 @@
-gps_dependency_packages:
+pagespeed_dependency_packages:
   - gcc-c++
   - libuuid-devel
   - make
+  - openssl-devel
   - pcre-devel
   - unzip
   - zlib-devel
+
+pagespeed_apache_repo: https://dl-ssl.google.com/dl/linux/direct/mod-pagespeed-stable_current_x86_64.rpm
+pagespeed_apache_module_dir: /usr/lib64/httpd/modules
+pagespeed_apache_daemon: httpd
+pagespeed_apache_conf_path: /etc/httpd/conf.d/pagespeed.conf
