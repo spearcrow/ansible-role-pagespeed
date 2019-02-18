@@ -1,22 +1,23 @@
 {% if ansible_os_family == 'RedHat' %}
 <IfModule !mod_version.c>
-  LoadModule version_module {{ pagespeed_apache_module_dir }}/mod_version.so
+  LoadModule version_module {{ 'modules' if pagespeed_cpanel else pagespeed_apache_module_dir }}/mod_version.so
 </IfModule>
-
 <IfVersion < 2.4>
-  LoadModule pagespeed_module {{ pagespeed_apache_module_dir }}/mod_pagespeed.so
+  LoadModule pagespeed_module {{ 'modules' if pagespeed_cpanel else pagespeed_apache_module_dir }}/mod_pagespeed.so
 </IfVersion>
 <IfVersion >= 2.4.2>
+{%  if not pagespeed_cpanel %}
   <IfModule !access_compat_module>
     LoadModule access_compat_module {{ pagespeed_apache_module_dir }}/mod_access_compat.so
   </IfModule>
-
-  LoadModule pagespeed_module {{ pagespeed_apache_module_dir }}/mod_pagespeed_ap24.so
+{%  endif %}
+  LoadModule pagespeed_module {{ 'modules' if pagespeed_cpanel else pagespeed_apache_module_dir }}/mod_pagespeed_ap24.so
 </IfVersion>
-
+{%  if not pagespeed_cpanel %}
 <IfModule !mod_deflate.c>
  LoadModule deflate_module {{ pagespeed_apache_module_dir }}/mod_deflate.so
 </IfModule>
+{%  endif %}
 {% endif %}
 <IfModule pagespeed_module>
     # Turn on mod_pagespeed. To completely disable mod_pagespeed, you
@@ -46,6 +47,7 @@
 {% else %}
     ModPagespeedSslCertDirectory "/etc/ssl/certs"
 {% endif %}
+
     # If you want, you can use one or more memcached servers as the store for
     # the mod_pagespeed cache.
     # ModPagespeedMemcachedServers localhost:11211
