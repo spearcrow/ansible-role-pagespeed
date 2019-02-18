@@ -1,0 +1,14 @@
+---
+- name: Set ModPageSpeed configuration file
+  template:
+    src: mod-pagespeed.conf.j2
+    dest: "{{ pagespeed_apache_conf_path }}"
+  when: pagespeed_webserver == 'apache'
+  notify: reload apache
+
+- name: Set NgxPageSpeed configuration file
+  template:
+    src: ngx-pagespeed.conf.j2
+    dest: /etc/nginx/pagespeed.conf
+  when: pagespeed_webserver == 'nginx'
+  notify: reload nginx
