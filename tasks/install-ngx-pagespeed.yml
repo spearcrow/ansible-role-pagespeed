@@ -1,0 +1,76 @@
+---
+- name: check nginx version compatibility
+  shell: /usr/sbin/nginx -v 2>&1
+  register: __pagespeed_nginx_version
+  when: pagespeed_nginx_version is not defined
+
+- name: Define Nginx version
+  set_fact:
+    pagespeed_nginx_version: "{{ __pagespeed_nginx_version.stdout.split('/').1 }}"
+  when: pagespeed_nginx_version is not defined
+
+- name: Check Nginx configure arguments
+  shell: nginx -V 2>&1 | awk -F":" '/configure/ {print $2}'
+  register: __pagespeed_ngx_configure_args
+  when: pagespeed_ngx_configure_args is not defined
+
+- name: Define Nginx configure arguments
+  set_fact:
+    pagespeed_ngx_configure_args: "{{ __pagespeed_ngx_configure_args.stdout }}"
+  when: pagespeed_ngx_configure_args is not defined
+
+- name: Check Nginx compatibility
+  fail:
+    msg: "Cannot install google page speed module without nginx version higher than 1.11.5"
+  when: pagespeed_nginx_version < "1.11.5"
+
+- name: Install dependeny for build ngx_pagespeed
+  package:
+    name: "{{ pagespeed_dependency_packages }}"
+    state: installed
+
+- name: download and unarchive nginx
+  unarchive:
+    src: "http://nginx.org/download/nginx-{{ pagespeed_nginx_version }}.tar.gz"
+    dest: /tmp
+    remote_src: yes
+
+- name: download and unarchive google pagespeed
+  unarchive:
+    src: "https://github.com/pagespeed/ngx_pagespeed/archive/v{{ pagespeed_version }}.tar.gz"
+    dest: /tmp
+    creates: /tmp/incubator-pagespeed-ngx-{{ pagespeed_version }}
+    remote_src: yes
+
+- name: download and unarchive psol
+  unarchive:
+    src: https://dl.google.com/dl/page-speed/psol/{{ pagespeed_version.split('-')[0] }}-{{ pagespeed_psol_arch }}.tar.gz
+    dest: /tmp/incubator-pagespeed-ngx-{{ pagespeed_version }}
+    creates: /tmp/incubator-pagespeed-ngx-{{ pagespeed_version }}/psol
+    remote_src: true
+
+- name: configure nginx
+  command: >
+    ./configure --add-dynamic-module=../incubator-pagespeed-ngx-{{ pagespeed_version }}
+    --with-compat {{ pagespeed_ngx_configure_args }}
+  args:
+    chdir: "/tmp/nginx-{{ pagespeed_nginx_version }}"
+  changed_when: false
+
+- name: build nginx from source
+  command: make modules
+  args:
+    chdir: "/tmp/nginx-{{ pagespeed_nginx_version }}"
+  changed_when: false
+
+- name: copy extension to nginx modules
+  copy:
+    src: /tmp/nginx-{{ pagespeed_nginx_version }}/objs/ngx_pagespeed.so
+    dest: /etc/nginx/modules/ngx_pagespeed.so
+    remote_src: true
+
+- name: enable ngx_pagespeed extension
+  lineinfile:
+    path: /etc/nginx/nginx.conf
+    line: "load_module modules/ngx_pagespeed.so;"
+    insertbefore: BOF
