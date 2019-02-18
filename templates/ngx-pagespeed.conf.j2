@@ -1,5 +1,8 @@
 pagespeed on;
-pagespeed FileCachePath "/var/cache/ngx_pagespeed/";
+pagespeed FileCachePath "/var/ngx_pagespeed/";
+
+pagespeed SslCertDirectory /etc/pki/tls/certs;
+pagespeed SslCertFile /etc/pki/tls/cert.pem;
 
 location ~ "\.pagespeed\.([a-z]\.)?[a-z]{2}\.[^.]{10}\.[^.]+" {
     add_header "" "";
