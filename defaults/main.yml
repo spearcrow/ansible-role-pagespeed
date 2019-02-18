@@ -1,3 +1,5 @@
 ---
-gps_version: 1.13.35.2-stable
-gps_ngx_version: 1.14.2
+pagespeed_webserver: apache
+pagespeed_version: 1.13.35.2-stable
+pagespeed_nginx_version: 1.14.2
+pagespeed_psol_arch: "{{ 'x64' if (ansible_architecture == 'x86_64') else 'ia32' }}"
