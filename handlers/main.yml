@@ -3,8 +3,17 @@
   service:
     name: "{{ pagespeed_apache_daemon }}"
     state: reloaded
+  when: pagespeed_webserver == 'apache' and not pagespeed_cpanel
+  listen: restart web service
+
+- name: reload apache
+  command: /scripts/restartsrv_httpd --reload
+  when: pagespeed_webserver == 'apache' and pagespeed_cpanel
+  listen: restart web service
 
 - name: reload nginx
   service:
     name: nginx
     state: reloaded
+  when: pagespeed_webserver == 'nginx'
+  listen: restart web service

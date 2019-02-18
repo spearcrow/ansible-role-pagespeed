@@ -28,4 +28,18 @@
         name: "{{ pagespeed_apache_repo }}"
         state: present
 
-  when: ansible_os_family == 'RedHat'
+  when: ansible_os_family == 'RedHat' and not pagespeed_cpanel
+
+- block:
+
+    - name: Install EA4 experimental repository
+      yum:
+        name: ea4-experimental
+        state: present
+    
+    - name: Install EA4 ModPageSpeed
+      yum:
+        name: ea-apache24-mod_pagespeed
+        state: present
+
+  when: ansible_os_family == 'RedHat' and pagespeed_cpanel
