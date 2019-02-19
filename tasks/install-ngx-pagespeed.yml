@@ -1,4 +1,9 @@
 ---
+- name: Ensure ngx_pagespeed module already installed
+  stat:
+    path: /etc/nginx/modules/ngx_pagespeed.so
+  register: pagespeed_nginx_status
+
 - name: check nginx version compatibility
   shell: /usr/sbin/nginx -v 2>&1
   register: __pagespeed_nginx_version
@@ -22,7 +27,7 @@
 - name: Check Nginx compatibility
   fail:
     msg: "Cannot install google page speed module without nginx version higher than 1.11.5"
-  when: pagespeed_nginx_version < "1.11.5"
+  when: pagespeed_nginx_version is version('1.11.5','<')
 
 - name: Install dependeny for build ngx_pagespeed
   package:
@@ -55,22 +60,24 @@
     --with-compat {{ pagespeed_ngx_configure_args }}
   args:
     chdir: "/tmp/nginx-{{ pagespeed_nginx_version }}"
-  changed_when: false
+  when: not pagespeed_nginx_status.stat.exists
 
 - name: build nginx from source
   command: make modules
   args:
     chdir: "/tmp/nginx-{{ pagespeed_nginx_version }}"
-  changed_when: false
+  when: not pagespeed_nginx_status.stat.exists
 
 - name: copy extension to nginx modules
   copy:
     src: /tmp/nginx-{{ pagespeed_nginx_version }}/objs/ngx_pagespeed.so
     dest: /etc/nginx/modules/ngx_pagespeed.so
     remote_src: true
+  when: not pagespeed_nginx_status.stat.exists
 
 - name: enable ngx_pagespeed extension
   lineinfile:
     path: /etc/nginx/nginx.conf
+    regex: "^load.*ngx_pagespeed.+$"
     line: "load_module modules/ngx_pagespeed.so;"
     insertbefore: BOF
